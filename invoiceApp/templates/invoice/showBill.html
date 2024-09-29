@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>Show Bills</title>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5"></div>
+
+    <h1 class="text-center">Show Bills</h1>
+
+    <form method="GET" action="{% url 'showBill_url' %}" class="mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" name="customer" class="form-control" placeholder="Search by Customer Name" value="{{ request.GET.customer }}">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="date" class="form-control" placeholder="Search by Date" value="{{ request.GET.date }}">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">Invoice</th>
+                <th scope="col">Date</th>
+                <th scope="col">Customer Name</th>
+                <th scope="col">Total Amount</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+                <tr>
+                   
+                    <td>{{ record.Invoice }}</td>
+                    <td>{{ record.date }}</td>
+                    <td>{{ record.customer }}</td>
+                    <td>{{ record.total_amount }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'print_docx_url' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="invoice_id" value="{{ record.Invoice }}">
+                            <button type="submit" class="btn btn-success">Print</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

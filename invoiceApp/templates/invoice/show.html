@@ -1,0 +1,79 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>Show Orders</title>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5"></div>
+
+    <h1 class="text-center">Show Orders</h1>
+
+    <form method="GET" action="{% url 'show_url' %}" class="mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" name="q" class="form-control" placeholder="Search by Supplier Name" value="{{ query }}">
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="customer" class="form-control" placeholder="Search by Customer Name" value="{{ request.GET.customer }}">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="sales_challan_date" class="form-control" placeholder="Search by Sales Challan Date" value="{{ request.GET.sales_challan_date }}">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <a href="{% url 'export_csv_url' %}" class="btn btn-primary mb-3">Export to CSV</a>
+
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">Order ID</th>
+                <th scope="col">Supplier Name</th>
+                <th scope="col">Customer Name</th>
+                <th scope="col">Place</th>
+                <th scope="col">Driver Name</th>
+                <th scope="col">Lorry number</th>
+                <th scope="col">Purchase Challan no.</th>
+                <th scope="col">Sales Challan no</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Number of trips</th>
+                <th scope="col">Entry Date</th>
+                <th scope="col">Purchase Challan Date</th>
+                <th scope="col">Sales Challan Date</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in obj %}
+                <tr>
+                    <td>{{i.oid}}</td>
+                    <td>{{i.fname}}</td>
+                    <td>{{i.Cname}}</td>
+                    <td>{{i.Pname}}</td>
+                    <td>{{i.Dname}}</td>
+                    <td>{{i.Lno}}</td>
+                    <td>{{i.pcno}}</td>
+                    <td>{{i.scno}}</td>
+                    <td>{{i.product}}</td>
+                    <td>{{i.pcs}}</td>
+                    <td>{{i.trip}}</td>
+                    <td>{{i.df1}}</td>
+                    <td>{{i.df2}}</td>
+                    <td>{{i.df3}}</td>
+                    <td>{{i.amount}}</td>
+                    <td>
+                        <button class="btn btn-light"><a href="{% url 'update_url' i.oid %}">Edit</a></button>
+                        <button class="btn btn-danger"><a href="{% url 'delete_url' i.oid %}">Delete</a></button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

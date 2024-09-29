@@ -1,0 +1,46 @@
+<!-- customer_info.html -->
+
+{% extends 'layout.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+    <title>Customer Info</title>
+{% endblock %}
+
+{% block content %}
+    <center><h1>Customer Information</h1></center>
+    <form method="GET" action="{% url 'customer_info_url' %}">
+        <input type="text" name="q" placeholder="Search by Customer Name" value="{{ query }}">
+        <button type="submit">Search</button>
+    </form>
+    <a href="{% url 'customer_add_url' %}" class="btn btn-primary">Add Customer</a>
+    <table class="table">
+        <!-- Add table headers and rows based on Customer model fields -->
+        <thead>
+            <tr>
+              <th scope="col">Customer Name</th>
+              <th scope="col">Group</th>
+              <th scope="col">Address</th>
+              <th scope="col">Phone Number</th>
+              <th scope="col">GST</th>
+              <th scope="col">PAN</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for i in customers %}
+            <tr>
+              <td>{{i.Cname}}</td>
+              <td>{{i.group}}</td>
+              <td>{{i.adr}}</td>
+              <td>{{i.phone}}</td>
+              <td>{{i.gst}}</td>
+              <td>{{i.pan}}</td>
+              <td>
+                <button class="btn btn-light"><a href="{% url 'update_cus_url' i.Cname %}">Edit</a></button>
+                <button class="btn btn-danger"><a href="{% url 'delete_cus_url' i.Cname %}">Delete</a></button>
+            </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+    </table>
+{% endblock %}

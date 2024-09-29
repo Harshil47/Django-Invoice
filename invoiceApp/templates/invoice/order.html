@@ -1,0 +1,149 @@
+{% extends 'layout.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    <title>Add Page</title>
+{% endblock %}
+<head>
+
+</head>
+{% block content %}
+    <center><h1>Order Form</h1></center>
+    <div class="container">
+        <form method="post" class="jumbotron">
+            {% csrf_token %}
+            {{form|crispy}}
+            <div class="form-group">
+                <button type="button" onclick="calculateAmount()">Calculate</button>
+            </div>
+            <div id="amount-display"></div>
+            <input type="submit" value="Delivery Detail" class="btn btn-success">
+        </form>
+    </div>
+    <script>
+        function adjustDimension(value) {
+            var wholePart = Math.floor(value);
+            var decimalPart = value % 1;
+
+    // Adjust decimal part
+            var adjustedDecimal = (decimalPart *100) / 12;
+
+    // Add whole and adjusted decimal parts
+            return wholePart + adjustedDecimal;
+        }
+
+        function calculateAmount() {
+    var productId = document.getElementById('id_product');
+      
+    fetch(`/get-product-details/${productId.value}`)
+        .then(response => {
+            if (!response.ok) {
+                console.log(productId);  
+                throw new Error(`HTTP error!! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+           // document.getElementById('id_rate').value = data.rate;
+            //document.getElementById('id_quantity_per').value = data.quantity_per;
+            console.log(data.rate); 
+            console.log(data.quantity_per);
+            // Additional code to update the displayed amount
+            var quantity = parseFloat(document.getElementById('id_pcs').value);
+            var height = parseFloat(document.getElementById('id_height').value);
+            var width = parseFloat(document.getElementById('id_width').value);
+            var length = parseFloat(document.getElementById('id_length').value);
+
+
+            var fHeight = adjustDimension(height);
+            var fWidth = adjustDimension(width);
+            var fLength = adjustDimension(length);
+            console.log(fHeight);
+            console.log(fWidth);
+            console.log(fLength);
+
+            var amountDisplay = document.getElementById('amount-display');
+
+            // ... (existing code)
+
+            if (data.name.includes('Brick')) {
+    // Calculate amount based on quantity, rate, and quantity_per
+                var amount = (data.rate / data.quantity_per) * quantity;
+                amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
+         }  else if (data.name.includes('SandSqft')) {
+    // Calculate amount based on height, width, length, rate, and quantity_per
+                var pcsQuantity = fHeight * fWidth * fLength;
+                var amount = (pcsQuantity * data.rate) / data.quantity_per;
+
+                amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
+                document.getElementById('id_pcs').value = pcsQuantity.toFixed(2);
+                
+        }
+
+             else if (data.name.includes('SandPiece')) {
+    // Calculate amount based on height, width, length, rate, and quantity_per
+
+                var amount = data.rate * quantity;
+                amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
+        }
+            else if (data.name.includes('Cement')) {
+    // Calculate amount based on height, width, length, rate, and quantity_per
+
+                var amount = data.rate * quantity;
+                amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
+        }
+        
+        else {
+                amountDisplay.textContent = 'Calculated Amount: N/A';
+}
+
+        })
+        .catch(error => {
+            console.error('Error fetching product details:', error);
+            var amountDisplay = document.getElementById('amount-display');
+            amountDisplay.textContent = 'Calculated Amount: N//A';
+        });
+}
+
+function updateProductDetails() {
+    var productId = document.getElementById('id_product');
+
+    if (!productId) {
+        console.error("Element with ID 'id_product' not found.");
+        return;
+    }
+
+    fetch(`/get-product-details/${productId.value}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                // Ensure the 'data.rate' property exists before setting the value
+                if ('name' in data) {
+                    productId.value = data.name;
+                    console.log('Product name updated:', data.name);
+                } else {
+                    console.error('Property "rate" not found in product details:', data);
+                }
+            } else {
+                console.error('No data received from the server.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching product details:', error);
+        });
+}
+
+
+
+function submitForm() {
+            document.getElementById('order-form').submit();
+        }
+
+
+    </script>
+{% endblock %}

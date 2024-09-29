@@ -1,0 +1,68 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>Bill Page</title>
+{% endblock %}
+
+{% block content %}
+    <center><h1>Bill Details</h1></center>
+
+    <form method="GET" action="{% url 'bill_url' %}">
+        <label for="customer">Select Customer:</label>
+        <select name="customer" id="customer">
+            <option value="">All Customers</option>
+            {% for name in customer_names %}
+                <option value="{{ name }}" {% if name == selected_customer %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="start_date">Start Date:</label>
+        <input type="date" name="start_date" value="{{ start_date }}" />
+
+        <label for="end_date">End Date:</label>
+        <input type="date" name="end_date" value="{{ end_date }}" />
+
+        <button type="submit">Filter</button>
+    </form>
+    <p>Selected Date Range: {{ start_date|date:"Y-m-d" }} to {{ end_date|date:"Y-m-d" }}</p>
+
+    <form id="billForm" method="POST" action="{% url 'bill_url' %}">
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Customer Name</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Pname</th>
+                <th scope="col">Total Trips</th>
+                <th scope="col">Total Quantity</th>
+                <th scope="col">Total Amount</th>
+                <th scope="col">Rate</th>
+                <th scope="col">Select</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in bill_items %}
+                <tr>
+                    <td>{{ item.Cname }}</td>
+                    <td>{{ item.product }}</td>
+                    <td>{{ item.Pname }}</td>
+                    <td>{{ item.total_trips }}</td>
+                    <td>{{ item.total_pcs }}</td>
+                    <td>{{ item.total_amount }}</td>
+
+                    <td>
+                        <button class="btn btn-warning"><a href="{% url 'rate_url' item.temp_rate_id %}">Rate</a></button>
+                    </td>
+                    <td>
+                        <input type="checkbox" name="selected_rows" value="{{ item.temp_rate_id}}">
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" name="action" value="bill">Bill</button>
+    </form>
+
+   
+{% endblock %}

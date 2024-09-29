@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>Search Orders</title>
+{% endblock %}
+
+{% block content %}
+    <center><h1>Search Orders</h1></center>
+    
+    <form method="GET" action="{% url 'search_orders_url' %}">
+        <input type="text" name="search_input" placeholder="Search by Supplier Name" value="{{ search_input }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Order ID</th>
+                <th scope="col">Supplier Name</th>
+                <!-- Add other table headers as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in obj %}
+                <tr>
+                    <td>{{ i.oid }}</td>
+                    <td>{{ i.fname }}</td>
+                    <!-- Add other table cells as needed -->
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

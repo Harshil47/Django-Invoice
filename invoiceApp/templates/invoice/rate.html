@@ -1,0 +1,158 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>Rate Page</title>
+{% endblock %}
+
+{% block content %}
+    <center><h1>Rate Details</h1></center>
+    
+    <form id="calculateForm" method="post" action="{% url 'rate_url' id=temp_rate.id %}">
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Order ID</th>
+                    <th scope="col">Supplier Name</th>
+                    <th scope="col">Place</th>
+                    <th scope="col">Product Name</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Date Field 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.oid }}</td>
+                    <td>{{ order.fname }}</td>
+                    <td>{{ order.Pname }}</td>
+                    <td>{{ order.product }}</td>
+                    <td>{{ order.pcs }}</td>
+                    <td>{{ order.df3|date:"Y-m-d" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tr>
+                <td>Total Quantity:</td>
+                <td>{{ aggregated_quantity }}</td>
+            </tr>
+            <tr>
+                <td>Total Rate:</td>
+                <td><input type="text" name="total_rate" required></td>
+            </tr>
+            <tr>
+                <td>Material Rate:</td>
+                <td><input type="text" name="material_rate" required></td>
+            </tr>
+            <tr>
+                <td>Bill Date:</td>
+                <td><input type="date" name="bill_date" required></td>
+            </tr>
+            <!-- Hidden fields for additional data -->
+
+
+        <input type="hidden" id="hiddenTotalRate" name="total_rate" value="">
+        <input type="hidden" id="hiddenMaterialRate" name="material_rate" value="">
+        <input type="hidden" id="hiddenOID" name="oid" value="{{ order.oid }}">
+        <input type="hidden" id="hiddenProduct" name="product" value="{{ order.product }}">
+        <input type="hidden" id="hiddenPlace" name="place" value="{{ order.Pname }}">
+        <input type="hidden" id="hiddenCName" name="cname" value="{{ order.Cname }}">
+        <input type="hidden" id="hiddenBillDate" name="bill_date" value="">
+        </table>
+        <button type="button" id="calculateButton" value="calculate" onclick="calculateAmount(event)">Calculate</button>
+
+        
+    </form>
+
+    <h2>Additional Rate Information</h2>
+    <!-- Display the calculated values if available -->
+    <div id="calculatedValues">
+        <p>Transport Rate: <span id="transportRate"></span></p>
+        <p>Amount: <span id="amount"></span></p>
+        <form method="post" action="{% url 'submit_url' id=temp_rate.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="oid" value="{{ order_instance.oid }}">
+            <input type="hidden" name="product" value="{{ order_instance.product }}">
+            <input type="hidden" name="place" value="{{ order_instance.Pname }}">
+            <input type="hidden" name="cname" value="{{ order_instance.Cname }}">
+            <input type="hidden" name="total_rate" id="hiddenTotalRateSubmit" value="">
+            <input type="hidden" name="material_rate" id="hiddenMaterialRateSubmit" value="">
+            <input type="hidden" name="bill_date" id="hiddenBillDateSubmit" value="">
+            <button type="submit" name="action" value="submit">Submit</button>
+        </form>
+    </div>
+
+    <h2>Previous Bill Information</h2>
+    {% if previous_bills %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Bill ID</th>
+                    <th>Customer Name</th>
+                    <th>Bill Date</th>
+                    <th>Final Rate</th>
+                    <th>Material Rate</th>
+                    <th>Transport Rate</th>
+                    <th>Final Amount</th>
+
+                    <!-- Add more headers as needed -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for bill in previous_bills %}
+                    <tr>
+                        <td>{{ bill.bill_id }}</td>
+                        <td>{{ bill.Cname }}</td>
+                        <td>{{ bill.bill_date }}</td>
+                        <td>{{ bill.final_rate }}</td>
+                        <td>{{ bill.material_rate }}</td>
+                        <td>{{ bill.transport_rate }}</td>
+                        <td>{{ bill.final_amount }}</td>
+
+                        <!-- Add more columns as needed -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No previous bills found for this customer, place, and product.</p>
+    {% endif %}
+    
+
+    <script>
+        function calculateAmount(event) {
+            const totalRateInput = document.querySelector('input[name="total_rate"]');
+            const materialRateInput = document.querySelector('input[name="material_rate"]');
+            const orderQuantity = {{ aggregated_quantity }} ; 
+    
+            const totalRate = parseFloat(totalRateInput.value);
+            const materialRate = parseFloat(materialRateInput.value);
+            
+            if (!isNaN(totalRate) && !isNaN(materialRate)) {
+                const transportRate = totalRate - materialRate;
+                const amount = orderQuantity * totalRate;
+    
+                document.getElementById("transportRate").textContent = transportRate;
+                document.getElementById("amount").textContent = amount;
+
+                document.getElementById("hiddenTotalRateSubmit").value = totalRate;
+                document.getElementById("hiddenMaterialRateSubmit").value = materialRate;
+                document.getElementById("hiddenBillDateSubmit").value = document.querySelector('input[name="bill_date"]').value;// ... set the value as needed;
+                document.getElementById("hiddenProduct").value = "{{ order_instance.product }}";
+                document.getElementById("hiddenPlace").value = "{{ order_instance.Pname }}";
+                document.getElementById("hiddenCName").value = "{{ order_instance.Cname }}";
+    
+                // Prevent the default form submission
+               // event.preventDefault();
+    
+                // If calculation is valid, you can also submit the form using AJAX if needed
+                // Example: submitForm();
+            } else {
+                // Handle invalid input (alert the user or display an error message)
+              //  alert("Please enter valid numbers for total rate and material rate.");
+            }
+        
+        }
+    </script>
+</div>
+{% endblock %}
