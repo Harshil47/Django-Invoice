@@ -6,14 +6,14 @@
 
 {% block content %}
     <center><h1>Rate Details</h1></center>
-    
+
     <form id="calculateForm" method="post" action="{% url 'rate_url' id=temp_rate.id %}">
         {% csrf_token %}
         <table class="table">
             <thead>
                 <tr>
                     <th scope="col">Order ID</th>
-                    <th scope="col">Supplier Name</th>
+                    <th scope="col">Customer Name</th>
                     <th scope="col">Place</th>
                     <th scope="col">Product Name</th>
                     <th scope="col">Quantity</th>
@@ -24,7 +24,7 @@
                 {% for order in orders %}
                 <tr>
                     <td>{{ order.oid }}</td>
-                    <td>{{ order.fname }}</td>
+                    <td>{{ order.Cname }}</td>
                     <td>{{ order.Pname }}</td>
                     <td>{{ order.product }}</td>
                     <td>{{ order.pcs }}</td>
@@ -61,7 +61,7 @@
         </table>
         <button type="button" id="calculateButton" value="calculate" onclick="calculateAmount(event)">Calculate</button>
 
-        
+
     </form>
 
     <h2>Additional Rate Information</h2>
@@ -69,7 +69,7 @@
     <div id="calculatedValues">
         <p>Transport Rate: <span id="transportRate"></span></p>
         <p>Amount: <span id="amount"></span></p>
-        <form method="post" action="{% url 'submit_url' id=temp_rate.id %}">
+        <form method="post" action="{% url 'rate_url' id=temp_rate.id %}">
             {% csrf_token %}
             <input type="hidden" name="oid" value="{{ order_instance.oid }}">
             <input type="hidden" name="product" value="{{ order_instance.product }}">
@@ -117,21 +117,24 @@
     {% else %}
         <p>No previous bills found for this customer, place, and product.</p>
     {% endif %}
-    
+
 
     <script>
+        const quantityPer = {{ quantity_per }};
         function calculateAmount(event) {
             const totalRateInput = document.querySelector('input[name="total_rate"]');
             const materialRateInput = document.querySelector('input[name="material_rate"]');
-            const orderQuantity = {{ aggregated_quantity }} ; 
-    
+            const orderQuantity = {{ aggregated_quantity }} ;
+
+
             const totalRate = parseFloat(totalRateInput.value);
             const materialRate = parseFloat(materialRateInput.value);
-            
+
             if (!isNaN(totalRate) && !isNaN(materialRate)) {
                 const transportRate = totalRate - materialRate;
-                const amount = orderQuantity * totalRate;
-    
+
+                const amount = orderQuantity * (totalRate/ quantityPer);
+
                 document.getElementById("transportRate").textContent = transportRate;
                 document.getElementById("amount").textContent = amount;
 
@@ -141,17 +144,15 @@
                 document.getElementById("hiddenProduct").value = "{{ order_instance.product }}";
                 document.getElementById("hiddenPlace").value = "{{ order_instance.Pname }}";
                 document.getElementById("hiddenCName").value = "{{ order_instance.Cname }}";
-    
-                // Prevent the default form submission
-               // event.preventDefault();
-    
+
+
                 // If calculation is valid, you can also submit the form using AJAX if needed
                 // Example: submitForm();
             } else {
                 // Handle invalid input (alert the user or display an error message)
               //  alert("Please enter valid numbers for total rate and material rate.");
             }
-        
+
         }
     </script>
 </div>

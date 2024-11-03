@@ -17,10 +17,10 @@
         </select>
 
         <label for="start_date">Start Date:</label>
-        <input type="date" name="start_date" value="{{ start_date }}" />
+        <input type="date" name="start_date" value="{{ start_date|date:"Y-m-d" }}" />
 
         <label for="end_date">End Date:</label>
-        <input type="date" name="end_date" value="{{ end_date }}" />
+        <input type="date" name="end_date" value="{{ end_date|date:"Y-m-d" }}" />
 
         <button type="submit">Filter</button>
     </form>
@@ -33,10 +33,12 @@
             <tr>
                 <th scope="col">Customer Name</th>
                 <th scope="col">Product Name</th>
-                <th scope="col">Pname</th>
+                <th scope="col">Place</th>
                 <th scope="col">Total Trips</th>
                 <th scope="col">Total Quantity</th>
                 <th scope="col">Total Amount</th>
+                <th scope="col">Merged Records</th>
+                <th scope="col">Rated</th>
                 <th scope="col">Rate</th>
                 <th scope="col">Select</th>
             </tr>
@@ -48,9 +50,10 @@
                     <td>{{ item.product }}</td>
                     <td>{{ item.Pname }}</td>
                     <td>{{ item.total_trips }}</td>
-                    <td>{{ item.total_pcs }}</td>
-                    <td>{{ item.total_amount }}</td>
-
+                    <td>{{ item.total_pcs |floatformat:2 }}</td>
+                    <td>{{ item.total_amount |floatformat:2 }}</td>
+                    <td>{{ item.merged_count }}</td>
+                    <td>{{ item.rated }}</td>
                     <td>
                         <button class="btn btn-warning"><a href="{% url 'rate_url' item.temp_rate_id %}">Rate</a></button>
                     </td>
@@ -64,5 +67,5 @@
         <button type="submit" name="action" value="bill">Bill</button>
     </form>
 
-   
+
 {% endblock %}

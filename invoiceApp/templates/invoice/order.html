@@ -1,149 +1,251 @@
 {% extends 'layout.html' %}
 {% load crispy_forms_tags %}
+{% load widget_tweaks %}
 
 {% block title %}
     <title>Add Page</title>
 {% endblock %}
 <head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+        /* Additional styling for customization */
+        .btn {
+            padding: 10px 15px;
+            color: white;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+    </style>
 
 </head>
 {% block content %}
     <center><h1>Order Form</h1></center>
-    <div class="container">
-        <form method="post" class="jumbotron">
+    <div class="container mt-4">
+        <div class="text-right mb-2">
+            <strong>Bill Number: {{ new_invoice_number }}</strong>
+        </div>
+        <button type="button" id="clearDataButton" class="btn btn-danger">Clear Data</button> <!-- Clear Data Button -->
+        <form method="post" class="jumbotron" id="order-form">
             {% csrf_token %}
-            {{form|crispy}}
+            <!-- {{ form|crispy }} -->
+<div class="row g-3">
+                <!-- First Column -->
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        {{ form.fname.label_tag }} {{ form.fname|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.Cname.label_tag }} {{ form.Cname|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.Pname.label_tag }} {{ form.Pname|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.Dname.label_tag }} {{ form.Dname|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.scno.label_tag }} {{ form.scno|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.pcno.label_tag }} {{ form.pcno|add_class:"form-control" }}
+                    </div>
+
+                </div>
+
+                <!-- Second Column -->
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        {{ form.df1.label_tag }} {{ form.df1|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.df2.label_tag }} {{ form.df2|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.df3.label_tag }} {{ form.df3|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.purchaseRate.label_tag }} {{ form.purchaseRate|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.product.label_tag }} {{ form.product|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.trip.label_tag }} {{ form.trip|add_class:"form-control" }}
+                    </div>
+
+
+                </div>
+
+                <!-- Third Column -->
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        {{ form.Lno.label_tag }} {{ form.Lno|add_class:"form-control" }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.length.label_tag }} {{ form.length|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.width.label_tag }} {{ form.width|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.height.label_tag }} {{ form.height|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.pcs.label_tag }} {{ form.pcs|add_class:"form-control" }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.billed.label_tag }} {{ form.billed|add_class:"form-control" }}
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <button type="button" onclick="calculateAmount()">Calculate</button>
             </div>
             <div id="amount-display"></div>
-            <input type="submit" value="Delivery Detail" class="btn btn-success">
+            <input type="submit" value="Submit" class="btn btn-success">
         </form>
     </div>
+
+    <!-- Script to handle LocalStorage persistence -->
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get all form inputs
+            const form = document.querySelector("#order-form");
+            const inputs = form.querySelectorAll("input, select, textarea");
+
+            // Load saved data from LocalStorage
+            inputs.forEach(input => {
+                const savedValue = localStorage.getItem(input.id);
+                if (savedValue) {
+                    input.value = savedValue;
+                }
+            });
+
+            // Save form data to LocalStorage on input change
+            inputs.forEach(input => {
+                input.addEventListener("input", function() {
+                    localStorage.setItem(input.id, input.value);
+                });
+            });
+
+            // Optional: Clear form data from LocalStorage on form submission
+            form.addEventListener("submit", function() {
+                inputs.forEach(input => {
+                    localStorage.removeItem(input.id);
+                });
+            });
+
+            // Clear Data Button functionality
+            document.getElementById('clearDataButton').addEventListener('click', function() {
+                // Clear form fields
+                form.reset();  // Resets the form fields to their initial values
+
+                // Clear data from LocalStorage
+                inputs.forEach(input => {
+                    localStorage.removeItem(input.id);
+                });
+
+                // Optional alert for user feedback
+                alert("Temporary data cleared.");
+            });
+        });
+
         function adjustDimension(value) {
             var wholePart = Math.floor(value);
             var decimalPart = value % 1;
 
-    // Adjust decimal part
-            var adjustedDecimal = (decimalPart *100) / 12;
-
-    // Add whole and adjusted decimal parts
-            return wholePart + adjustedDecimal;
+            var adjustedDecimal = (decimalPart * 100) / 12;
+            return parseFloat((wholePart + adjustedDecimal).toFixed(2));
         }
 
         function calculateAmount() {
-    var productId = document.getElementById('id_product');
-      
-    fetch(`/get-product-details/${productId.value}`)
-        .then(response => {
-            if (!response.ok) {
-                console.log(productId);  
-                throw new Error(`HTTP error!! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-           // document.getElementById('id_rate').value = data.rate;
-            //document.getElementById('id_quantity_per').value = data.quantity_per;
-            console.log(data.rate); 
-            console.log(data.quantity_per);
-            // Additional code to update the displayed amount
-            var quantity = parseFloat(document.getElementById('id_pcs').value);
-            var height = parseFloat(document.getElementById('id_height').value);
-            var width = parseFloat(document.getElementById('id_width').value);
-            var length = parseFloat(document.getElementById('id_length').value);
+            var productId = document.getElementById('id_product');
 
+            fetch(`/get-product-details/${productId.value}`)
+                .then(response => {
+                    if (!response.ok) {
+                        console.log(productId);
+                        throw new Error(`HTTP error!! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var quantity = parseFloat(document.getElementById('id_pcs').value);
+                    var height = parseFloat(document.getElementById('id_height').value);
+                    var width = parseFloat(document.getElementById('id_width').value);
+                    var length = parseFloat(document.getElementById('id_length').value);
 
-            var fHeight = adjustDimension(height);
-            var fWidth = adjustDimension(width);
-            var fLength = adjustDimension(length);
-            console.log(fHeight);
-            console.log(fWidth);
-            console.log(fLength);
+                    var fHeight = adjustDimension(height);
+                    var fWidth = adjustDimension(width);
+                    var fLength = adjustDimension(length);
 
-            var amountDisplay = document.getElementById('amount-display');
+                    var amountDisplay = document.getElementById('amount-display');
 
-            // ... (existing code)
+                    if (data.name.includes('Bricks-F')) {
+                        var amount = (data.rate / data.quantity_per) * quantity;
+                        amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
+                    } else if (data.name.includes('Bricks-B')) {
+                        var amount = (data.rate / data.quantity_per) * quantity;
+                        amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
+                    } else if (data.name.includes('Sand-R') || data.name.includes('Khadi-T') || data.name.includes('Crush-Sand') || data.name.includes('Powder')) {
+                        var pcsQuantity = fHeight * fWidth * fLength;
+                        pcsQuantity = Math.round(pcsQuantity);
+                        var amount = (pcsQuantity * data.rate) / data.quantity_per;
 
-            if (data.name.includes('Brick')) {
-    // Calculate amount based on quantity, rate, and quantity_per
-                var amount = (data.rate / data.quantity_per) * quantity;
-                amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
-         }  else if (data.name.includes('SandSqft')) {
-    // Calculate amount based on height, width, length, rate, and quantity_per
-                var pcsQuantity = fHeight * fWidth * fLength;
-                var amount = (pcsQuantity * data.rate) / data.quantity_per;
-
-                amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
-                document.getElementById('id_pcs').value = pcsQuantity.toFixed(2);
-                
+                        amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
+                        document.getElementById('id_pcs').value = pcsQuantity.toFixed(2);
+                        console.log('Height:', fHeight);
+                        console.log('Width:', fWidth);
+                        console.log('Length:', fLength);
+                        console.log('pcsQuantity:', pcsQuantity);
+                        console.log('Rate:', data.rate);
+                        console.log('Quantity Per:', data.quantity_per);
+                        console.log('Amount:', amount);
+                    } else if (data.name.includes('Sand-Bags')) {
+                        var amount = data.rate * quantity;
+                        amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
+                    } else if (data.name.includes('Cement') || data.name.includes('Tempo-Khadi') || data.name.includes('Tempo-Powder')) {
+                        var amount = data.rate * quantity;
+                        amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
+                    } else {
+                        amountDisplay.textContent = 'Calculated Amount: N/A';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching product details:', error);
+                    var amountDisplay = document.getElementById('amount-display');
+                    amountDisplay.textContent = 'Calculated Amount: N/A';
+                });
         }
 
-             else if (data.name.includes('SandPiece')) {
-    // Calculate amount based on height, width, length, rate, and quantity_per
-
-                var amount = data.rate * quantity;
-                amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
+        function updateLorryDetails() {
+            var lorryId = document.getElementById('id_Lno').value; // Update this ID based on your form field
+            fetch(`/get-lorry-details/${lorryId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error!! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Assuming the response contains height, width, and length
+                    document.getElementById('id_height').value = data.height; // Update based on your form field IDs
+                    document.getElementById('id_width').value = data.width; // Update based on your form field IDs
+                    document.getElementById('id_length').value = data.length; // Update based on your form field IDs
+                })
+                .catch(error => {
+                    console.error('Error fetching lorry details:', error);
+                });
         }
-            else if (data.name.includes('Cement')) {
-    // Calculate amount based on height, width, length, rate, and quantity_per
-
-                var amount = data.rate * quantity;
-                amountDisplay.textContent = 'Calculated Amount: ' + amount.toFixed(2);
-        }
-        
-        else {
-                amountDisplay.textContent = 'Calculated Amount: N/A';
-}
-
-        })
-        .catch(error => {
-            console.error('Error fetching product details:', error);
-            var amountDisplay = document.getElementById('amount-display');
-            amountDisplay.textContent = 'Calculated Amount: N//A';
-        });
-}
-
-function updateProductDetails() {
-    var productId = document.getElementById('id_product');
-
-    if (!productId) {
-        console.error("Element with ID 'id_product' not found.");
-        return;
-    }
-
-    fetch(`/get-product-details/${productId.value}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data) {
-                // Ensure the 'data.rate' property exists before setting the value
-                if ('name' in data) {
-                    productId.value = data.name;
-                    console.log('Product name updated:', data.name);
-                } else {
-                    console.error('Property "rate" not found in product details:', data);
-                }
-            } else {
-                console.error('No data received from the server.');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching product details:', error);
-        });
-}
-
-
-
-function submitForm() {
-            document.getElementById('order-form').submit();
-        }
-
-
     </script>
+
 {% endblock %}

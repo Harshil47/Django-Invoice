@@ -1,0 +1,47 @@
+<!-- customer_info.html -->
+
+{% extends 'layout.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+    <title>Product Info</title>
+{% endblock %}
+
+{% block content %}
+    <center><h1>Product Information</h1></center>
+    <form method="GET" action="{% url 'product_info_url' %}">
+        <input type="text" name="q" placeholder="Search by Product Name" value="{{ query }}">
+        <input type="text" name="hsn" placeholder="Search by HSN Code" value="{{ hsn_query }}">
+        <button type="submit">Search</button>
+    </form>
+    <a href="{% url 'product_add_url' %}" class="btn btn-primary">Add Product</a>
+    <table class="table">
+        <!-- Add table headers and rows based on Customer model fields -->
+        <thead>
+            <tr>
+              <th scope="col">Product</th>
+              <th scope="col">Quantity Per Unit</th>
+              <th scope="col">PCS</th>
+              <th scope="col">Rate</th>
+              <th scope="col">Tax Rate</th>
+              <th scope="col">HSN Code</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for i in products %}
+            <tr>
+              <td>{{i.name}}</td>
+              <td>{{i.quantity_per}}</td>
+              <td>{{i.pcs_fts}}</td>
+              <td>{{i.rate}}</td>
+              <td>{{i.tax_rate}}</td>
+              <td>{{i.hsn_code}}</td>
+              <td>
+                <button class="btn btn-light"><a href="{% url 'update_product_url' i.name %}">Edit</a></button>
+                <button class="btn btn-danger"><a href="{% url 'delete_product_url' i.name %}">Delete</a></button>
+            </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+    </table>
+{% endblock %}

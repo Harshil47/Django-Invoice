@@ -1,0 +1,157 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>Tax Statements</title>
+{% endblock %}
+
+{% block content %}
+    <h2>Sales Bill</h2>
+    <form method="GET" class="form-inline">
+        <div class="form-group">
+            <label for="hsn_code">Filter by HSN Code:</label>
+            <input type="text" name="hsn_code" id="hsn_code" class="form-control" value="{{ request.GET.hsn_code }}">
+        </div>
+        <div class="form-group">
+            <label for="start_date">Start Date:</label>
+            <input type="date" name="start_date" class="form-control" value="{{ start_date|date:'Y-m-d' }}">
+        </div>
+        <div class="form-group">
+            <label for="end_date">End Date:</label>
+            <input type="date" name="end_date" class="form-control" value="{{ end_date|date:'Y-m-d' }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+    {% if start_date and end_date %}
+        <p><strong>Date Range Selected:</strong> From {{ start_date|date:'Y-m-d' }} to {{ end_date|date:'Y-m-d' }}</p>
+    {% endif %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>HSN Code</th>
+                <th>Total Quantity</th>
+                <th>Pre-tax Amount</th>
+                <th>CGST</th>
+                <th>SGST</th>
+                <th>Total Taxable Amount</th>
+                 <th>Net Profit</th>
+                <th>Show Details</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for product, data in tax_statements.items %}
+                <tr>
+                    <td>{{ product }}</td>
+                    <td>{{ data.hsn_code }}</td>
+                    <td>{{ data.total_quantity|floatformat:0 }}</td>
+                    <td>{{ data.total_taxable_amount|floatformat:2 }}</td>
+                    <td>{{ data.total_cgst|floatformat:2 }}</td>
+                    <td>{{ data.total_sgst|floatformat:2 }}</td>
+                    <td>{{ data.total_final_amount|floatformat:2 }}</td>
+                    <td>{{ data.total_net_profit|floatformat:2 }}</td>
+                    <td>
+                    <a href="{% url 'show_url' %}?product={{ product }}&start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}" class="btn btn-info">Show Details</a>
+
+                </td>
+
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">No records found.</td>
+                </tr>
+            {% endfor %}
+            <tr>
+            <td><strong>Totals</strong></td>
+            <td></td>
+            <td></td>
+            <td><strong>{{ total_taxable_amount|floatformat:2 }}</strong></td>
+            <td><strong>{{ total_cgst|floatformat:2 }}</strong></td>
+            <td><strong>{{ total_sgst|floatformat:2 }}</strong></td>
+            <td><strong>{{ total_final_amount|floatformat:2 }}</strong></td>
+            <td><strong>{{ total_net_profit|floatformat:2 }}</strong></td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+
+<h2>Purchase Bill</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>HSN Code</th>
+            <th>Total Quantity</th>
+            <th>Pre-tax Amount</th>
+            <th>CGST</th>
+            <th>SGST</th>
+            <th>Purchase taxable Amount</th>
+            <th>Show Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product, data in purchase_statements.items %}
+            <tr>
+                <td>{{ product }}</td>
+                <td>{{ data.hsn_code }}</td>
+                <td>{{ data.total_quantity|floatformat:0 }}</td>
+                <td>{{ data.total_purchase_pretax_amount|floatformat:2 }}</td>
+                <td>{{ data.total_purchase_cgst|floatformat:2 }}</td>
+                <td>{{ data.total_purchase_sgst|floatformat:2 }}</td>
+                <td>{{ data.total_purchase_amount|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'show_url' %}?product={{ product }}&start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}" class="btn btn-info">Show Details</a>
+
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="7">No purchase records found.</td>
+            </tr>
+        {% endfor %}
+        <!-- Totals row for purchase amounts -->
+    <tr>
+        <td><strong>Totals</strong></td>
+        <td></td>
+        <td></td>
+        <td><strong>{{ total_purchase_pretax_amount|floatformat:2 }}</strong></td>
+        <td><strong>{{ total_purchase_cgst|floatformat:2 }}</strong></td>
+        <td><strong>{{ total_purchase_sgst|floatformat:2 }}</strong></td>
+        <td><strong>{{ total_purchase_amount_Overall |floatformat:2 }}</strong></td>
+    </tr>
+    </tbody>
+</table>
+{% for customer, customer_data in tax_statements_by_customer.items %}
+        <h2>Customer: {{ customer.Cname }}</h2>
+        <p>GST: {{ customer_data.gst }}</p>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>HSN Code</th>
+                    <th>Total Quantity</th>
+                    <th>Pre-tax Amount</th>
+                    <th>CGST</th>
+                    <th>SGST</th>
+                    <th>Total Taxable Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product, data in customer_data.products.items %}
+                    <tr>
+                        <td>{{ product }}</td>
+                        <td>{{ data.hsn_code }}</td>
+                        <td>{{ data.total_quantity|floatformat:0 }}</td>
+                        <td>{{ data.total_taxable_amount|floatformat:2 }}</td>
+                        <td>{{ data.total_cgst|floatformat:2 }}</td>
+                        <td>{{ data.total_sgst|floatformat:2 }}</td>
+                        <td>{{ data.total_final_amount|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+
+{% endblock %}

@@ -1,0 +1,16 @@
+<!-- customer_add.html -->
+
+{% extends 'layout.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+    <title>Add Product</title>
+{% endblock %}
+
+{% block content %}
+    <center><h1>Add Product</h1></center>
+    <form method="post" class="jumbotron">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="Add Product" class="btn btn-success">
+    </form>
+{% endblock %}

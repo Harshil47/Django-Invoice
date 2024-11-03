@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            width: 70%;
+            margin: 0 auto 50px;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'welcome_url' %}" class="btn">Back to Landing Page</a>
+<h1>Analytics Dashboard</h1>
+
+<div class="chart-container">
+    <h2>Total Revenue by Product</h2>
+    <canvas id="totalRevenueChart" width="400" height="200"></canvas>
+</div>
+
+<div class="chart-container">
+    <h2>Average Rate per Product</h2>
+    <canvas id="averageRateChart" width="400" height="200"></canvas>
+</div>
+
+<div class="chart-container">
+    <h2>Top Customer Contribution</h2>
+    <canvas id="topCustomerChart" width="400" height="200"></canvas>
+</div>
+
+<script>
+// Function to fetch data from backend and render chart
+async function fetchAndRender(url, chartId, chartType, labelKey, dataKey, title, bgColor, borderColor) {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        const labels = data.map(item => item[labelKey]);
+        const values = data.map(item => item[dataKey]);
+
+        const ctx = document.getElementById(chartId).getContext('2d');
+        new Chart(ctx, {
+            type: chartType,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: title,
+                    data: values,
+                    backgroundColor: bgColor,
+                    borderColor: borderColor,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error(`Error fetching data for ${title}:`, error);
+    }
+}
+
+// Fetch and render total revenue by product (Bar Chart)
+fetchAndRender(
+    '/analytics/total-revenue/',  // Django URL for total revenue
+    'totalRevenueChart',
+    'bar',  // Bar chart type
+    'product__name',
+    'total_revenue',
+    'Total Revenue by Product',
+    'rgba(75, 192, 192, 0.2)',  // Background color
+    'rgba(75, 192, 192, 1)'     // Border color
+);
+
+
+// Fetch and render average rate per product (Line Chart)
+fetchAndRender(
+    '/analytics/average-rate/',
+    'averageRateChart',
+    'line',  // Line chart type
+    'product',  // Change to match the key in your JSON response
+    'avg_rate', // Keep this as it is
+    'Average Rate per Product',
+    'rgba(153, 102, 255, 0.2)',  // Background color
+    'rgba(153, 102, 255, 1)'     // Border color
+);
+// Fetch and render top customer contribution (Pie Chart)
+fetchAndRender(
+    '/analytics/top-customers/',
+    'topCustomerChart',
+    'pie',  // Pie chart type
+    'Cname',
+    'total_contribution',
+    'Top Customer Contribution',
+    [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(255, 206, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+    ],  // Multiple colors for pie chart sections
+    [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+    ]   // Multiple border colors for pie chart sections
+);
+</script>
+
+</body>
+</html>

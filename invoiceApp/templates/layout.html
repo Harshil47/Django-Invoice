@@ -16,11 +16,11 @@
                 padding: 20px 10px;  /* Increase padding within the navbar */
                 height: 80px;        /* Increase overall navbar height */
             }
-    
+
             .navbar-brand {
                 font-size: 24px;     /* Increase brand name size */
             }
-    
+
             .navbar-nav .nav-link {
                 font-size: 20px;     /* Increase link font size */
                 margin-right: 20px;   /* Increase spacing between links */
@@ -29,9 +29,9 @@
 </head>
 
 <body>
-    <!--<nav class="navbar navbar-expand-lg navbar-light bg-light"> --> 
+    <!--<nav class="navbar navbar-expand-lg navbar-light bg-light"> -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
-        <a class="navbar-brand" href="#">Sanghavi</a>
+        <a class="navbar-brand" href="{% url 'welcome_url' %}">Sanghavi</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -46,11 +46,33 @@
                     <a class="nav-link" href="{% url 'show_url' %}">Show Orders</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'customer_info_url' %}">Customer Info</a>
+                    <a class="nav-link" href="{% url 'supplier_info_url' %}">Supplier</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'lorry_info_url' %}">Lorry </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'product_info_url' %}">Product </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'customer_info_url' %}">Customer</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'bill_url' %}">Billing</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'showBill_url' %}">Records</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tax_statements' %}">Statements</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'payment_page_url' %}">UnPaid</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'analytics_dashboard' %}">Analytics</a>
+                </li>
+
             </ul>
         </div>
     </nav>

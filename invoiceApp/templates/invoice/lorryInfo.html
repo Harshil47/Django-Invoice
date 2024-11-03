@@ -1,0 +1,42 @@
+
+
+{% extends 'layout.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+    <title>Lorry Info</title>
+{% endblock %}
+
+{% block content %}
+    <center><h1>Lorry Information</h1></center>
+    <form method="GET" action="{% url 'lorry_info_url' %}">
+        <input type="text" name="q" placeholder="Search by Lorry Number" value="{{ query }}">
+        <button type="submit">Search</button>
+    </form>
+    <a href="{% url 'lorry_add_url' %}" class="btn btn-primary">Add Lorry</a>
+    <table class="table">
+
+        <thead>
+            <tr>
+              <th scope="col">Lorry Number</th>
+              <th scope="col">Length</th>
+              <th scope="col">Height</th>
+              <th scope="col">Width</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for i in lorries %}
+            <tr>
+              <td>{{i.Lno}}</td>
+              <td>{{i.length}}</td>
+              <td>{{i.width}}</td>
+              <td>{{i.height}}</td>
+              <td>
+                <button class="btn btn-light"><a href="{% url 'update_lorry_url' i.Lno %}">Edit</a></button>
+                <button class="btn btn-danger"><a href="{% url 'delete_lorry_url' i.Lno %}">Delete</a></button>
+            </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+    </table>
+{% endblock %}

@@ -11,14 +11,46 @@
 
     <form method="GET" action="{% url 'show_url' %}" class="mb-3">
         <div class="row">
+            <!--
             <div class="col-md-4">
                 <input type="text" name="q" class="form-control" placeholder="Search by Supplier Name" value="{{ query }}">
             </div>
             <div class="col-md-4">
                 <input type="text" name="customer" class="form-control" placeholder="Search by Customer Name" value="{{ request.GET.customer }}">
             </div>
-            <div class="col-md-3">
-                <input type="text" name="sales_challan_date" class="form-control" placeholder="Search by Sales Challan Date" value="{{ request.GET.sales_challan_date }}">
+            -->
+                    <div class="col-md-4">
+            <select name="q" class="form-control">
+                <option value="">Select Supplier</option>
+                {% for supplier in suppliers %}
+                    <option value="{{ supplier.fname }}" {% if supplier.fname == query %}selected{% endif %}>{{ supplier.fname }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select name="customer" class="form-control">
+                <option value="">Select Customer</option>
+                {% for customer in customers %}
+                    <option value="{{ customer.Cname }}" {% if customer.Cname == customer_query %}selected{% endif %}>{{ customer.Cname }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+         <div class="col-md-4">
+            <select name="product" class="form-control"> <!-- New product filter -->
+                <option value="">Select Product</option>
+                {% for product in products %}
+                    <option value="{{ product.name }}" {% if product.name == product_query %}selected{% endif %}>{{ product.name }}</option> <!-- Assuming 'name' is a field in Product -->
+                {% endfor %}
+            </select>
+        </div>
+
+
+            <div class="col-md-2">
+                <input type="date" name="start_date" class="form-control" placeholder="Start Date" value="{{ start_date_query }}">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="end_date" class="form-control" placeholder="End Date" value="{{ end_date_query }}">
             </div>
             <div class="col-md-1">
                 <button type="submit" class="btn btn-primary">Search</button>
@@ -27,49 +59,48 @@
     </form>
 
     <a href="{% url 'export_csv_url' %}" class="btn btn-primary mb-3">Export to CSV</a>
+    <p>Showing {{ filtered_count }} of {{ total_count }} entries</p>
 
-    <table class="table">
+<table class="table">
         <thead class="thead-light">
             <tr>
-                <th scope="col">Order ID</th>
-                <th scope="col">Supplier Name</th>
-                <th scope="col">Customer Name</th>
-                <th scope="col">Place</th>
-                <th scope="col">Driver Name</th>
-                <th scope="col">Lorry number</th>
-                <th scope="col">Purchase Challan no.</th>
-                <th scope="col">Sales Challan no</th>
-                <th scope="col">Product Name</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Number of trips</th>
-                <th scope="col">Entry Date</th>
-                <th scope="col">Purchase Challan Date</th>
-                <th scope="col">Sales Challan Date</th>
-                <th scope="col">Amount</th>
-                <th scope="col">Actions</th>
+
+            <th scope="col" style="position: sticky; top: 70px; background-color: white;">Sales Challan no.</th>
+            <th scope="col" style="position: sticky; top: 70px; background-color: white;">Purchase Challan no.</th>
+            <th scope="col" style="position: sticky; top: 70px; background-color: white;">Sales Challan Date</th>
+            <th scope="col" style="position: sticky; top: 70px; background-color: white;">Customer Name</th>
+            <th scope="col" style="position: sticky; top: 70px; background-color: white;">Number of trips</th>
+            <th scope="col" style="position: sticky; top: 70px; background-color: white;">Lorry number</th>
+            <th scope="col" style="position: sticky; top: 70px; background-color: white;">Product Name</th>
+            <th scope="col" style="position: sticky; top: 70px; background-color: white;">HSN Code</th>
+            <th scope="col" style="position: sticky; top: 70px; background-color: white;">Quantity</th>
+            <th scope="col" style="position: sticky; top: 70px; background-color: white;">Amount</th>
+            <th scope="col" style="position: sticky; top: 70px; background-color: white;">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for i in obj %}
                 <tr>
-                    <td>{{i.oid}}</td>
-                    <td>{{i.fname}}</td>
-                    <td>{{i.Cname}}</td>
-                    <td>{{i.Pname}}</td>
-                    <td>{{i.Dname}}</td>
-                    <td>{{i.Lno}}</td>
-                    <td>{{i.pcno}}</td>
                     <td>{{i.scno}}</td>
-                    <td>{{i.product}}</td>
-                    <td>{{i.pcs}}</td>
-                    <td>{{i.trip}}</td>
-                    <td>{{i.df1}}</td>
-                    <td>{{i.df2}}</td>
+                    <td>{{i.pcno}}</td>
                     <td>{{i.df3}}</td>
-                    <td>{{i.amount}}</td>
+                    <td>{{i.Cname.Cname}}</td>
+                    <td>{{i.trip}}</td>
+                    <td>{{i.Lno}}</td>
+                    <td>{{i.product}}</td>
+                    <td>{{ i.product.hsn_code }}</td>
+                    <td>{{i.pcs|floatformat:0}}</td>
+                    <td>{{i.amount |floatformat:2}}</td>
                     <td>
                         <button class="btn btn-light"><a href="{% url 'update_url' i.oid %}">Edit</a></button>
                         <button class="btn btn-danger"><a href="{% url 'delete_url' i.oid %}">Delete</a></button>
+                        <form action="{% url 'unpaid_url' i.oid %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-warning" onclick="return confirm('Are you sure you want to mark this as unpaid?');" style="color: white;">
+        Unpaid
+    </button>
+</form>
+    </button>
                     </td>
                 </tr>
             {% endfor %}

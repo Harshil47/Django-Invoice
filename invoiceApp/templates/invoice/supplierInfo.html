@@ -1,0 +1,42 @@
+<!-- customer_info.html -->
+
+{% extends 'layout.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+    <title>Supplier Info</title>
+{% endblock %}
+
+{% block content %}
+    <center><h1>Supplier Information</h1></center>
+    <form method="GET" action="{% url 'supplier_info_url' %}">
+        <input type="text" name="q" placeholder="Search by Supplier Name" value="{{ query }}">
+        <button type="submit">Search</button>
+    </form>
+    <a href="{% url 'supplier_add_url' %}" class="btn btn-primary">Add Supplier</a>
+    <table class="table">
+
+        <thead>
+            <tr>
+              <th scope="col">Supplier Name</th>
+              <th scope="col">GST</th>
+              <th scope="col">Address</th>
+              <th scope="col">Phone Number</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for i in suppliers %}
+            <tr>
+              <td>{{i.fname}}</td>
+              <td>{{i.gst}}</td>
+              <td>{{i.adr}}</td>
+              <td>{{i.phone}}</td>
+              <td>
+                <button class="btn btn-light"><a href="{% url 'supplier_update_url' i.fname %}">Edit</a></button>
+                <button class="btn btn-danger"><a href="{% url 'supplier_delete_url' i.fname %}">Delete</a></button>
+            </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+    </table>
+{% endblock %}

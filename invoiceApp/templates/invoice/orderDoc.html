@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Order Page Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section p {
+            line-height: 1.6;
+        }
+
+        .example {
+            background-color: #f9f9f9;
+            border-left: 4px solid #0056b3;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #777;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Page Documentation</h1>
+        
+
+        <div class='section'><h2>Overview</h2>
+        <p>The Order Page allows users to submit detailed order forms that capture essential information such as supplier details, customer information, delivery location, product specifications, and quantity details. This page also includes an amount calculation feature, which computes the total order cost based on the product type, quantity, and dimensions (for specific products like Sand or Khadi). The form dynamically calculates the order total and stores the data in the database upon submission.
+
+            <h2>How to Use</h2>
+            <h3>Accessing the Order Page</h3>
+            <p>Navigate to the "Order Form" page on the Django Invoice application.</p>
+    
+            <h3>Filling the Form</h3>
+            <ul>
+                <li>Enter the required details, including supplier name, customer name, location, and other mandatory fields. Fields with placeholders will guide the user on what to enter.</li>
+                <li>Select the product from the dropdown list. Based on the product, you may be required to enter dimensions (for Sand or Khadi) or quantity (for Brick, SandPiece, or Cement).</li>
+            </ul>
+    
+            <h3>Calculating the Amount</h3>
+            <p>Click the "Calculate" button to compute the total amount based on the product, quantity, and dimensions (if applicable). The calculated amount will be displayed below the form.</p>
+    
+            <h3>Submitting the Form</h3>
+            <p>Once all the details are entered and the amount is calculated, click the "Delivery Detail" button to submit the order. After submission, the system will save the order and redirect you to the confirmation page.</p>
+    
+            <h2>Example Use Cases</h2>
+            <h3>Scenario 1: Ordering Bricks</h3>
+            <ul>
+                <li>Supplier Name: XYZ Suppliers</li>
+                <li>Customer Name: ABC Constructions</li>
+                <li>Location: Site 42, New Town</li>
+                <li>Product: Brick</li>
+                <li>Quantity: 500</li>
+            </ul>
+            <p>Click "Calculate" to get the total cost for the 500 bricks. Submit the form once all details are verified.</p>
+    
+            <h3>Scenario 2: Ordering Sand (by volume)</h3>
+            <ul>
+                <li>Supplier Name: XYZ Suppliers</li>
+                <li>Customer Name: ABC Constructions</li>
+                <li>Location: Site 42, New Town</li>
+                <li>Product: SandSqft</li>
+                <li>Height: 2.5 meters, Width: 3 meters, Length: 4 meters</li>
+            </ul>
+            <p>Click "Calculate" to compute the total volume and the corresponding amount. Submit the form once all details are verified.</p>
+
+    
+            <h2>Technical Details</h2>
+            <ul>
+                <li><strong>Backend Technologies:</strong> Django, ModelForm, ModelView</li>
+                <li><strong>Frontend Technologies:</strong> JavaScript, Bootstrap (for styling and form layout), Crispy Forms (for form rendering)</li>
+                <li><strong>Database Interaction:</strong> The Orders model is used to store the submitted data.</li>
+            </ul>
+        </div>
+        <h2>Product Amount Calculation - Documentation</h2>
+        <p>This documentation provides detailed information on how the amount calculation works for different products in the order page. Each product has its own method of calculation based on factors such as quantity, volume, or trips.</p>
+        <!-- Section for Brick and SandPiece -->
+        <div class="section">
+            <h3>1. Brick and SandPiece (Quantity-based Calculation)</h3>
+            <p>
+                For quantity-based products like <strong>bricks</strong> and <strong>SandPiece</strong>, the total amount is calculated by multiplying the rate per unit by the number of pieces (i.e., the quantity entered by the user).
+            </p>
+            <p><strong>Formula:</strong></p>
+            <p><code>Amount = Rate per Unit × Quantity</code></p>
+            <div class="example">
+                <p><strong>Example:</strong></p>
+                <p>Rate per brick is $2, and the quantity is 500 bricks:</p>
+                <p><code>Amount = 2 × 500 = 1000</code></p>
+            </div>
+        </div>
+
+        <!-- Section for Cement -->
+        <div class="section">
+            <h3>2. Cement (Bag-based Calculation)</h3>
+            <p>Cement is typically sold in bags. The total amount is computed by multiplying the rate per bag with the number of bags entered by the user.</p>
+            <p><strong>Formula:</strong></p>
+            <p><code>Amount = Rate per Bag × Number of Bags</code></p>
+            <div class="example">
+                <p><strong>Example:</strong></p>
+                <p>Rate per bag is $10, and the quantity is 50 bags:</p>
+                <p><code>Amount = 10 × 50 = 500</code></p>
+            </div>
+        </div>
+
+        <!-- Section for SandSqft and Khadi -->
+        <div class="section">
+            <h3>3. SandSqft and Khadi (Dimension-based Calculation)</h3>
+            <p>For dimension-based products like <strong>SandSqft</strong> and <strong>Khadi</strong>, the amount is calculated based on the volume using the dimensions provided by the user.</p>
+            <p><strong>Formula:</strong></p>
+            <p><code>Volume = Height × Width × Length</code></p>
+            <p><code>Amount = Rate per Cubic Meter × Volume</code></p>
+            <div class="example">
+                <p><strong>Example:</strong></p>
+                <p>Rate per cubic meter is $15, and the volume is calculated as:</p>
+                <p>Height = 2.5m, Width = 3m, Length = 4m:</p>
+                <p><code>Volume = 2.5 × 3 × 4 = 30 cubic meters</code></p>
+                <p><code>Amount = 15 × 30 = 450</code></p>
+            </div>
+        </div>
+
+
+      
+
+        <!-- Table summarizing all calculations -->
+        <div class="section">
+            <h3>Summary of Calculations:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Calculation Type</th>
+                        <th>Formula</th>
+                        <th>Inputs Needed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Brick</td>
+                        <td>Quantity-based</td>
+                        <td>Rate per Unit × Quantity</td>
+                        <td>Quantity</td>
+                    </tr>
+                    <tr>
+                        <td>SandPiece</td>
+                        <td>Quantity-based</td>
+                        <td>Rate per Unit × Quantity</td>
+                        <td>Quantity</td>
+                    </tr>
+                    <tr>
+                        <td>Cement</td>
+                        <td>Bag-based</td>
+                        <td>Rate per Bag × Number of Bags</td>
+                        <td>Number of Bags</td>
+                    </tr>
+                    <tr>
+                        <td>SandSqft</td>
+                        <td>Dimension-based</td>
+                        <td>Rate per Cubic Meter × Volume (H × W × L)</td>
+                        <td>Height, Width, Length</td>
+                    </tr>
+                    <tr>
+                        <td>Khadi</td>
+                        <td>Dimension-based</td>
+                        <td>Rate per Cubic Meter × Volume (H × W × L)</td>
+                        <td>Height, Width, Length</td>
+                    </tr>
+                    <tr>
+                        <td>SandPiece (Trip)</td>
+                        <td>Trip-based</td>
+                        <td>Rate per Trip × Number of Trips</td>
+                        <td>Number of Trips</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h2>Functionalities</h2>
+        <h3>Order Form Fields</h2>
+        <p>The order form is designed to capture detailed order information through the following fields:</p>
+        <ul>
+            <li><strong>Supplier Name (fname):</strong> Name of the supplier. Text input with a placeholder for guidance.</li>
+            <li><strong>Customer Name (Cname):</strong> Name of the customer placing the order.</li>
+            <li><strong>Location (Pname):</strong> The delivery location.</li>
+            <li><strong>Driver Name (Dname):</strong> Name of the driver delivering the product.</li>
+            <li><strong>Lorry Number (Lno):</strong> Number of the lorry used for transportation.</li>
+            <li><strong>Purchase Challan Number (pcno):</strong> Document number for the purchase.</li>
+            <li><strong>Sales Challan Number (scno):</strong> Document number for sales.</li>
+            <li><strong>Product Name (product):</strong> Dropdown list to select the product.</li>
+            <li><strong>Number of Trips (trip):</strong> Number of trips required for delivery.</li>
+            <li><strong>Quantity (pcs):</strong> The quantity of the product in units.</li>
+            <li><strong>Height, Width, Length:</strong> Dimensions required for products like Khadi and Sand that use these for volume-based calculations.</li>
+            <li><strong>Amount:</strong> This field is automatically calculated and hidden from the user’s view.</li>
+        </ul>
+
+        <h3>Form Validation</h2>
+        <p>The form validates the data provided by the user and calculates the amount based on the product type and quantity. Products such as bricks, cement, sand, and khadi have different formulas for calculating the order amount based on specific criteria (dimensions or quantity).</p>
+
+        <h3>Amount Calculation</h2>
+        <p>The order amount is calculated dynamically using the provided dimensions or quantity. Each product type has a unique calculation method, handled by the <code>calculateAmount()</code> JavaScript function and the <code>calculate_amount()</code> function in the backend.</p>
+        <p>For example:</p>
+        <ul>
+            <li><strong>Brick and SandPiece:</strong> Calculated by multiplying rate per quantity.</li>
+            <li><strong>SandSqft and Khadi:</strong> Calculated based on volume (height, width, and length) and rate.</li>
+        </ul>
+
+        <h3>Dynamic Amount Calculation</h2>
+        <p>When the user selects a product and enters the necessary details, the "Calculate" button triggers the amount calculation without submitting the form. This dynamic calculation is done via a JavaScript function <code>calculateAmount()</code>, which fetches product details (rate and quantity) and computes the amount accordingly.</p>
+
+        <h3>Product Selection and Details Update</h2>
+        <p>Selecting a product triggers the <code>updateProductDetails()</code> function, which fetches additional information about the product, such as rate and quantity per unit, and updates the form with relevant details.</p>
+
+        <h3>Form Submission</h2>
+        <p>Once the form is filled out, users can submit the order. Upon submission, the form is validated, and the final amount is recalculated if necessary. After validation, the order data is saved in the database, and the user is redirected to the <code>show_url</code> page.</p>
+
+        <h3>Backend Processing</h2>
+        <p>The order form data is processed on the server-side via the <code>orderFormView()</code> function. This view handles form validation, amount calculation, and saving the order instance with the calculated amount.</p>
+
+        <div class="footer">
+            <p>&copy; Smart Invoicing Solutions</p>
+        </div>
+    </div>
+</body>
+</html>
